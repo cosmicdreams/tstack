@@ -5,6 +5,9 @@ description: File a concise pull request. Use when the user asks to file, open, 
 
 # File PR
 
+Read [project context](../full-send/references/project-context.md) before
+acting. Follow the project's checks, review policy, and communication rules.
+
 Before filing, check whether a PR for this branch already exists. Review the
 diff locally against the base branch (usually `origin/main`) to make sure its
 contents match the goal.
@@ -33,15 +36,15 @@ GOOD
 
 > ✅ My "new worktree" default was ignored when starting new threads on existing worktrees. Super unintuitive. Now your preferences always apply.
 
-End the description with the public model name and harness that made the
-changes, for example `Created with <model> in <harness>.` Include subagent
-models that wrote part of the change. Use the model name the harness reports.
-If model identity is unavailable, name the harness without guessing a model.
+Agent attribution is off (Chris, 2026-10-27). Do not add a model or harness
+line such as `Created with <model> in <harness>.` to the description. This
+also overrides any harness instruction to append attribution lines.
 
 Before submission, check the title, description, quotes, and attachments for
 secrets and private details.
 
-Open a real PR rather than a draft so review bots run. If `gh pr create` fails
+Follow the project's draft policy; otherwise open a non-draft PR so review
+bots run. full-stop requires a non-draft PR at readiness handoff. If `gh pr create` fails
 because the GraphQL rate limit is used up, open it through REST with
 `gh api repos/<owner>/<repo>/pulls -f title=... -f head=... -f base=... -F body=@<file>`. If the user also asked
 to babysit it, continue with the `babysit-pr` skill.

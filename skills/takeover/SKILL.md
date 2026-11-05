@@ -5,6 +5,9 @@ description: Take over existing work. Use when the user asks to take over a PR, 
 
 # Takeover
 
+Read [project context](../full-send/references/project-context.md) before
+acting. Follow the project's checks, review policy, and communication rules.
+
 Take responsibility for finishing the original goal while preserving the
 original contributors' credit. Do not defend an implementation just because
 another agent already built it.

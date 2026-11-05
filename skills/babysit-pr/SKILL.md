@@ -5,8 +5,11 @@ description: Monitor a pull request through review and CI. Use when the user ask
 
 # Babysit PR
 
-Many repos have AI review bots. They're helpful, even if they are not always
-right.
+Read [project context](../full-send/references/project-context.md) before
+acting. Follow the project's checks, review policy, and communication rules.
+
+Resolve required bots and human approvals from project guidance and live
+repository rules. Verify bot findings rather than assuming they are right.
 
 ## Waiting
 
@@ -22,7 +25,7 @@ a check fails, the required checks pass, someone comments or reviews, or the
 branch conflicts.
 
 - **Only the thread that owns the PR watches it.** If you are a delegated
-  child task (a reviewer, a Sol round, any `delegate_task` child), never call
+  child task (a reviewer, a review round, any `delegate_task` child), never call
   `watch_pull_request`. The parent owns the PR. Do not watch PRs you are not
   working on.
 - **A wake is news, not a merge decision.** Check the merge gate yourself.
@@ -49,7 +52,8 @@ met or the PR merges, 1 when it needs you (a required check failed, conflicts,
 unresolved threads, PR closed), and 2 on bad input.
 
 - `ready` (default): required checks green, Greptile or Macroscope reviewed the
-  head, and no unresolved threads. Use this to babysit.
+  head, and no unresolved threads. Use this only for projects that require
+  one of those bots.
 - `green`: required checks only. Use it when the repo has no Greptile or
   Macroscope.
 - `any-change`: exit on the first event.
@@ -66,6 +70,16 @@ Kill the old one only if its events do not reach you.
 With either watcher: when an event needs no action, end your turn without a
 message. Never post or say "still waiting".
 
+The bundled script recognizes Greptile and Macroscope as ready-gating bots;
+it does not evaluate arbitrary project policies. With no such bot requirement,
+use `green` for checks and inspect required reviews separately. For another
+required bot, use `any-change` notifications and inspect that bot's latest-head
+result yourself. A watcher exit is an event, not complete PR readiness.
+After laptop sleep or interruption, reread live state and check existing
+watcher ownership before restarting. Do not assume an unattended session kept
+running. If the host forbids the fallback watcher or cannot keep it alive,
+report the wait as blocked instead of inventing a polling loop.
+
 ## GitHub rate limits
 
 `gh pr create`, `gh pr view`, and `gh pr checks` use GraphQL. When GraphQL is
@@ -75,16 +89,17 @@ used up, the REST limit is separate and usually still has room. Use
 
 ## Reviews
 
-Only act on checks and comments newer than the latest push. Verify every bot
-finding against the source before changing code. Fix real findings and CI
+Evaluate checks on the current head and carry forward unresolved findings
+from earlier pushes. A push alone does not resolve a finding. Verify each
+finding against the current source before changing code. Fix real findings and CI
 failures, distinguish repository failures from infrastructure flakes, and reply
 with a written reason when dismissing false positives.
 
 If the repo has `.macroscope/check-run-agents/*.md`, read those rules before you
 reply to a Macroscope finding. Its findings cite them.
 
-CodeRabbit is advisory. Treat its findings like any other finding, but never
-wait for it and never hold a merge for it.
+Treat CodeRabbit or any other bot as advisory unless project policy requires
+it. A project's required bot or human reviewer cannot be waived here.
 
 If a review bot leaves feedback you believe is not worth addressing, reply with
 a written reason and resolve the comment. Use the `leaving-pr-comments` skill
@@ -101,7 +116,7 @@ narrows code.
 
 ## Base branch and merging
 
-Keep an eye on changes to `main` and rebase when needed. `pr-wait` reports when
+Keep an eye on changes to the PR's actual base branch and rebase when needed. `pr-wait` reports when
 new base commits touch this PR's files, and when the PR becomes BEHIND or DIRTY.
 `watch_pull_request` reports conflicts only, so check for BEHIND yourself
 before you call the PR ready.
@@ -109,8 +124,8 @@ If an overlapping PR makes this one obsolete, stop monitoring, report it to the
 user, and ask before closing the PR unless closure was explicitly authorized.
 
 If nothing has changed, stay quiet rather than posting filler comments. Stop
-when `pr-wait` exits 0, or in T3 Code when the merge gate passes on the latest
-head. Merge only when the user explicitly requested it;
+when the project's readiness gate passes on the latest head; a `pr-wait`
+exit 0 alone is insufficient. Merge only when the user explicitly requested it;
 otherwise report that the PR is ready. Right before a merge, run `git fetch` and
 check the PR again. Never merge when it is BEHIND or DIRTY, or when base commits
 that landed after the last green run touch this PR's files. Rebase, push, and

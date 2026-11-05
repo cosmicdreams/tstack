@@ -7,6 +7,9 @@ description: >-
 
 # Modernize
 
+Read [project context](../full-send/references/project-context.md) before
+acting. Follow the project's checks, review policy, and communication rules.
+
 Modernize the idea, not just the branch. A clean rebase does not prove that the
 PR still belongs in the product.
 
