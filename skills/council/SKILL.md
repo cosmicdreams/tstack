@@ -10,47 +10,56 @@ relevant checks. Give council the updated implementation; do not defer known
 fixes until reviews return. If the user wants to discard the implementation
 and explore new ideas, skip fixes to code being replaced.
 
-Bring in three delegates to help with the user's request, usually for review
-or feedback. Use one strong model from each of three different providers, at
-high reasoning effort. If the user's instructions name council members, use
-those. Otherwise pick the latest flagship model from each provider, for
-example Claude Opus, GPT Sol, and Gemini Pro.
+Bring independent delegates to the user's request, usually for review or
+feedback. Read [project context](../full-send/references/project-context.md)
+first. Resolve members from the user's global routing guidance and project
+permissions. Prefer distinct providers where permitted and available, but
+multiple agents from one provider can supply independent perspectives.
+Honor explicitly named members; report an unavailable member rather than
+silently replacing it. If membership is unspecified, use three reviewers
+with correctness, scope/simplicity, and verification perspectives. Resolve
+each model through the routing guidance; do not require three providers.
+Name every member by exact model ID, following "Naming models" in project
+context. Members on the same model ID are told apart by perspective, such as
+`claude-opus-5-5 (high), correctness`.
 
-In T3 Code, use `orchestrator_capabilities` to resolve the models, then
-`delegate_task` to start one delegate per model in parallel. Elsewhere, use
-the harness's subagent tools. If you cannot reach three providers, or a named
-member is unavailable, report it instead of substituting.
+On this laptop, run members sequentially by default. Keep their initial
+contexts independent: give each the same request and artifacts, not earlier
+members' verdicts. Do not start a worker fleet. Use more concurrency only when
+the user requests it or global guidance provides an explicit resource limit.
 
-Give each delegate the request and relevant context. For review or feedback,
-keep their work read-only. Collect their responses and summarize the useful
-findings, disagreements, and recommended next steps.
+Follow the host's orchestration rules. In T3, call
+`orchestrator_capabilities` once and use `delegate_task` when another
+provider, requested settings, background execution, or worktree isolation
+requires it. Put verified effort settings in `target.options`. Start a fresh
+review delegate for every new pass. Follow its completion notice; do not
+poll. Cancel replaced or unneeded delegates. Elsewhere use a configured route
+that actually runs each selected member. Do not silently change routes on
+failure. A failed or missing response is not approval.
 
-For a code review, ask each delegate for a score out of 10.
-Count each full review pass as one round.
-A fresh review after fixes starts a new round.
+Give each delegate the relevant context, scope, checks, and requested return
+format. Review delegates must remain read-only and must not start subagents,
+edit files, post comments, or watch PRs. Do not edit the scoped files while
+reviewers are running.
 
-If the work ends in a pull request, put the results in the PR description.
-Put this section before the model and harness line at the end:
+Ask reviewers to distinguish blockers, real in-scope bugs, and optional nits;
+request evidence and a verdict. Scores out of 10 may accompany code reviews,
+but a score is not an approval or readiness gate. Record absent scores as
+`no score`, never invent them.
 
-```markdown
-## Council review
+Default to at most three rounds. Round one covers the full change; later
+rounds cover changed code and open findings. Verify each finding yourself,
+make the smallest justified fixes, and rerun covering checks. Record accepted,
+disputed, and declined findings with evidence. Stop early when the current
+behavior diff is approved and no blocker remains. Nits do not require another
+round. Do not let repeated reviews expand scope or chase unanimity forever.
 
-Rounds: 2
+If a blocker remains disputed after two replies, a member cannot finish, or
+the round budget ends, report the unresolved issue and both sides. Do not
+claim consensus or let full-send merge on an incomplete review.
 
-| Delegate | Round 1 | Round 2 |
-| --- | --- | --- |
-| Claude Opus | 7/10 | 9/10 |
-| GPT Sol | 8/10 | 10/10 |
-| Gemini Pro | 7/10 | 9/10 |
-```
-
-If a delegate gives no score, write `no score`. Do not invent one.
-If the PR is open, edit the description. Do not post a comment for this.
-If there is no PR, put the same results in the final reply only.
-
-If you agree with their recommendations, make the changes and request a fresh
-review after. Continue this process until all delegates are satisfied with the
-outcome.
-
-Do not let repeated reviews result in scope creep. It is your job to fight to
-keep scope limited.
+Report members actually used by exact model ID, perspectives, rounds, verdicts, useful findings,
+disagreements, checks, and next steps. For an authorized PR update, include
+the results in its description using the project's communication conventions;
+do not post a separate comment just for the council. Otherwise report locally.
+Council feedback alone does not authorize a PR update, push, or merge.

@@ -40,15 +40,22 @@ for the steps under "Asking the user", such as production changes or data
 deletion. It also does not bypass a harness or system approval prompt if
 one appears.
 
+## Project context
+
+Read [project context](references/project-context.md) before acting. It defines
+worktree isolation, laptop resource defaults, model routing, and how project
+checks and communication rules are resolved. These apply to full-stop too.
+
 ## Steps
 
 1. **Finish the change.** Complete the goal from the user's request with the
    smallest change that works. Fix the case that happened, not every case
-   that could. If you are on the default branch, create a branch first.
+   that could. Before editing, establish a dedicated worktree on its own
+   branch under the golden rule; keep the main reference checkout read-only.
 2. **Prove it.** Get proof for every change you made. See "Proof".
-3. **Get feedback.** Use the `sol-loop` skill to verify changes.
-4. **File the PR** with the `file-pr` skill. Rebase onto the latest default
-   branch first. Add one short line to the description that says how you proved
+3. **Get feedback.** Use the `review-loop` skill to verify changes.
+4. **File the PR** with the `file-pr` skill. Rebase onto the latest intended target
+   branch first (the existing PR's actual base when updating one). Add one short line to the description that says how you proved
    the change.
 5. **Babysit the PR** with the `babysit-pr` skill. Fix real findings and CI
    failures. Get proof for each fix before you push it.
@@ -84,18 +91,22 @@ Ask the user.
 Full confidence means all of these are true on the latest commit:
 
 - Your proof covers every change in the diff.
+- review-loop approval covers the final behavior diff. Rerun it after meaningful
+  conflict resolutions or later fixes; earlier approval does not carry over.
 - Required checks are green.
-- Review bots have finished, and each finding is fixed or dismissed with a
-  written reason.
-- No human review still requests changes.
-- The branch is up to date with the default branch, and GitHub reports it as
-  mergeable.
+- Required project review bots have finished, and each actionable finding is
+  fixed or dismissed with a written reason. Advisory bots do not become gates
+  unless project policy requires them.
+- Required human approvals are present, and no human review still requests
+  changes.
+- The branch is up to date with its intended target branch, and GitHub reports
+  it as mergeable.
 
 Merge with the method the repo uses. Check the allowed methods and recent merged
 PRs. If the repo uses a merge queue or auto-merge, stay until GitHub reports the
 PR as merged. Merge through branch protection as configured. Never use `--admin`
-or other bypasses. You can ignore automated reviews that request "needs human
-review" if you have high confidence in your changes.
+or other bypasses. An automated request for human review follows the project's review policy;
+confidence does not waive required human approval.
 
 ## Asking the user
 
