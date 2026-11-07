@@ -57,6 +57,29 @@ shared plugin source is deliberately migrated. Jev is disabled in Claude's
 environment settings and Codex's shell environment. Restart sessions to load
 the new skills and configuration. See [validation](VALIDATION.md) for limits.
 
+## Upstream
+
+This fork tracks [t3dotgg/tstack](https://github.com/t3dotgg/tstack) until it
+diverges seriously. Pinned upstream: `1085050` (2026-10-27). Merge new upstream
+work with ordinary git:
+
+```bash
+git remote add upstream https://github.com/t3dotgg/tstack.git   # once
+git fetch upstream && git merge upstream/main                   # in a feature worktree
+```
+
+Files kept in local form, and why:
+
+| File | Reason |
+|---|---|
+| `skills/review-loop/SKILL.md` | Replaces upstream `sol-loop`: any other-family reviewer from global routing, not one fixed model. |
+| `skills/full-send/references/project-context.md` | Local only: worktrees, laptop limits, model routing, readiness, communication. |
+| `skills/full-send/SKILL.md`, `council`, `babysit-pr`, `file-pr`, `modernize`, `takeover`, `leaving-pr-comments` | Point at project context; `full-send` also switches `sol-loop` to `review-loop`, and council and review-loop require a rerunnable proof per finding (from pstack's interrogate). |
+| `scripts/install-local.py`, `tests/`, `AGENTS.md`, `VALIDATION.md`, `README.md`, `.gitignore` | Local installer, its tests and local documentation. |
+
+`full-stop` stays byte-identical to upstream. When an upstream merge touches a
+file above, resolve it by hand and update this table and the pin.
+
 ## Requirements
 
 - An authenticated [GitHub CLI](https://cli.github.com) (`gh`).

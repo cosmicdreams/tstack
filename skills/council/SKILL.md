@@ -43,14 +43,19 @@ edit files, post comments, or watch PRs. Do not edit the scoped files while
 reviewers are running.
 
 Ask reviewers to distinguish blockers, real in-scope bugs, and optional nits;
-request evidence and a verdict. Scores out of 10 may accompany code reviews,
+request evidence and a verdict. For code, each blocker or bug must carry a
+proof you can rerun: the command and the output it printed, or the file and
+line that shows the defect, plus the behavior the intent requires. Rerun or
+reread each proof before fixing. A finding whose proof does not reproduce is
+recorded as `dropped: not reproduced`, and the report counts dropped findings
+per member. (Adapted from pstack's interrogate, Lauren Tan, MIT.) Scores out of 10 may accompany code reviews,
 but a score is not an approval or readiness gate. Record absent scores as
 `no score`, never invent them.
 
 Default to at most three rounds. Round one covers the full change; later
 rounds cover changed code and open findings. Verify each finding yourself,
 make the smallest justified fixes, and rerun covering checks. Record accepted,
-disputed, and declined findings with evidence. Stop early when the current
+disputed, declined, and dropped findings with evidence. Stop early when the current
 behavior diff is approved and no blocker remains. Nits do not require another
 round. Do not let repeated reviews expand scope or chase unanimity forever.
 
@@ -58,7 +63,7 @@ If a blocker remains disputed after two replies, a member cannot finish, or
 the round budget ends, report the unresolved issue and both sides. Do not
 claim consensus or let full-send merge on an incomplete review.
 
-Report members actually used by exact model ID, perspectives, rounds, verdicts, useful findings,
+Report members actually used by exact model ID, perspectives, rounds, verdicts, useful findings, dropped counts,
 disagreements, checks, and next steps. For an authorized PR update, include
 the results in its description using the project's communication conventions;
 do not post a separate comment just for the council. Otherwise report locally.

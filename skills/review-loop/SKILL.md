@@ -92,12 +92,17 @@ blocker = intended case wrong. should = real bug callers will hit, in intent. ni
 Reply:
 VERDICT: APPROVE or CHANGES
 S1 [blocker|should|nit] <file>:<line> <claim>. Fix: <suggestion> (stable ids)
+Proof (blocker and should only): <command> -> <output it printed>, or the
+<file>:<line> text that shows the defect, plus what the intent requires.
+A blocker or should without a proof you checked is a nit.
 ```
 
 ## 3. Answer findings
 
 Check each finding and severity yourself. Another path, rare case, or
-small cost is a nit, whatever label it came with.
+small cost is a nit, whatever label it came with. Rerun or reread each
+blocker and should proof before fixing. A proof that does not reproduce goes
+in the ledger as `dropped: not reproduced`; report the dropped count.
 
 - Agree: smallest fix. Prefer delete or narrow over new lock, cache,
   helper, or option. Fix the case that happened. Add one focused test
@@ -113,7 +118,7 @@ review grew the diff, cut first. Do not agree just to end the loop.
 Start one only if budget remains and a blocker or should is open, behavior code
 changed, or approval does not cover the current behavior diff. Use a fresh
 `delegate_task` in T3, or follow up the saved native ID. Send the round 1 brief,
-the ledger (`fixed:` / `disagree:` / `declined:` + evidence), the same base
+the ledger (`fixed:` / `disagree:` / `declined:` / `dropped: not reproduced:` + evidence), the same base
 diff, and the change since last round. Tell the reviewer to check open ids and
 changed code only.
 Mark each old id `resolved` or `still open: <reason>`.
@@ -136,5 +141,5 @@ Verdict: approved`. Only claim approval on the current behavior diff. Add
 effort only if verified. Keep the exact model ID and review ledger in the
 local handoff even when the project uses a different public description format.
 
-Report: rounds, exact model ID, what the review changed, diff size before/after, fixed and
-declined findings with reasons, usage if exposed (else say not), pushed or not.
+Report: rounds, exact model ID, what the review changed, diff size before/after, fixed,
+declined, and dropped (not reproduced) findings with reasons, usage if exposed (else say not), pushed or not.
