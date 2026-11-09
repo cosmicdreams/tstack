@@ -42,3 +42,19 @@ Octopus retirement covers the council and delivery uses identified in this
 conversation. Its full research, scheduling, factory, and other feature set is
 not reimplemented. Existing research-lab, ideate, process-lab, and specialist
 plugins remain; Octopus source and data are preserved for rollback.
+
+## Repository rules, ledgers and the merge gate (2026-11-09)
+
+review-loop now names the repository's agent rules in the brief and saves
+its ledger to `~/.local/state/tstack/review-ledgers/` for workshop:harden.
+full-send walks a project's surface checklist, runs its changed-files check,
+and no longer treats "no required checks" as green. full-stop is unchanged
+and still matches upstream.
+
+- `tests/test_skills.py` turns the manual checks above into tests:
+  frontmatter, relative links, and the full-stop upstream hash. Each was seen
+  to fail on a mutated copy.
+- The new installer tests fail on the previous installer.
+- `scripts/run-evals.py`: every case failed 3/3 runs on `origin/main` text
+  and passed 3/3 on the new text with `claude-haiku-5-5`, and 1/1 with
+  `claude-sonnet-5-5`.

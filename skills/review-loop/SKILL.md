@@ -25,6 +25,13 @@ Make the smallest justified fixes. Push back on findings with evidence.
 - One reviewer only. The reviewer must not start subagents or reviewers.
 - Keep a ledger: implementer and reviewer model IDs, then per finding id,
   severity, outcome, usage if returned. Never guess it.
+- Save the ledger after each round, outside the repository, as JSON Lines at
+  `~/.local/state/tstack/review-ledgers/<owner>-<repo>/<branch>.jsonl`
+  (`/` in the branch becomes `-`). Append one line per finding per round:
+  `{"date","repo","branch","pr","round","implementer","reviewer","id","severity","file","claim","outcome"}`,
+  with `pr` null for local work and `outcome` one of `open`, `fixed`,
+  `disagree`, `declined`, `dropped`. A round with no findings appends one line
+  with `id` null. workshop:harden reads these files to find repeated mistakes.
 
 ## 1. Scope
 
@@ -44,8 +51,13 @@ Find the base after `git fetch origin`:
 
 The change is base to working tree in those paths, with untracked files.
 Use one diff command all rounds. State intent and out-of-scope in 1-2
-sentences. Run covering checks. Do not send code this change breaks. Note
-missing or pre-failing checks in the brief.
+sentences. Run covering checks, starting with the project's changed-files
+check command when its instructions name one. Do not send code this change
+breaks. Note missing or pre-failing checks in the brief.
+
+Find the project's agent rules: the repository's root `AGENTS.md` or
+`CLAUDE.md`, plus the testing or review documents they link. List those paths
+in the brief as `Rules:`, or write `Rules: none`.
 
 ## 2. Start the reviewer
 
@@ -83,8 +95,12 @@ Round 1 brief (T3 children get no history):
 ```
 Review only. Do not edit, commit, push, comment on PRs, or start subagents.
 Repo: <abs path> Base: <sha> Intent: <intent> Out of scope: <scope> Checks: <results>
+Rules: <paths or none>
 See: git diff <base> [-- <paths>]; git status --short (read untracked).
 Read surrounding code. Find bugs, broken callers, mismatch with intent.
+Read Rules. Flag a surface or entry point its checklist names that the
+intent needs and the change skipped, a test its testing policy forbids or
+requires, and a pattern one of its listed checks would reject.
 Skip style unless it hides a bug. Hold to the smallest change. Flag code,
 tests, or guards the intent does not need. Other paths, rare cases, small
 perf, extra compat: nits.

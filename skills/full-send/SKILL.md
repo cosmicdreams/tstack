@@ -52,6 +52,9 @@ checks and communication rules are resolved. These apply to full-stop too.
    smallest change that works. Fix the case that happened, not every case
    that could. Before editing, establish a dedicated worktree on its own
    branch under the golden rule; keep the main reference checkout read-only.
+   If the project's instructions have a surface checklist, walk it before
+   calling the change done, and say in the report and PR which entries
+   applied.
 2. **Prove it.** Get proof for every change you made. See "Proof".
 3. **Get feedback.** Use the `review-loop` skill to verify changes.
 4. **File the PR** with the `file-pr` skill. Rebase onto the latest intended target
@@ -76,7 +79,9 @@ reproduction, a screenshot. Use the most direct proof the change allows:
 
 - Reproduce the original failure, apply the fix, then watch the same
   reproduction pass.
-- Run the checks that the repo's CI runs (typecheck, lint, tests).
+- Run the checks that the repo's CI runs (typecheck, lint, tests). When the
+  project's instructions name a changed-files check command, run it on the
+  final commit and keep its output.
 - Add one focused test that fails without the fix, when the behavior has none
   and the repo has a test setup.
 - For UI and runtime behavior, run the app and look at the change. Green mocked
@@ -93,7 +98,10 @@ Full confidence means all of these are true on the latest commit:
 - Your proof covers every change in the diff.
 - review-loop approval covers the final behavior diff. Rerun it after meaningful
   conflict resolutions or later fixes; earlier approval does not carry over.
-- Required checks are green.
+- Required checks are green. When the repository requires no status checks,
+  or CI does not run on the PR, this item is not met by default: run the
+  checks CI would run on the final commit yourself, and report the missing
+  required checks as a risk.
 - Required project review bots have finished, and each actionable finding is
   fixed or dismissed with a written reason. Advisory bots do not become gates
   unless project policy requires them.
