@@ -41,9 +41,14 @@ uses review-loop, golden-rule worktrees, global model routing, and project
 checks and communication conventions. full-send remains explicit opt-in.
 
 After reviewing changes and running `python3 -m unittest discover -s tests -v`,
-install locally with `python3 scripts/install-local.py`. The optional
-`--project-root <path>` updates the old Team Sprint Mode instruction block in
-an existing non-git project container. The installer refuses repository targets.
+install locally with `python3 scripts/install-local.py`. When a change alters
+what a skill tells the model to do, also run `python3 scripts/run-evals.py`
+and add a case to `evals/cases.json` that fails on the old text
+(`--ref origin/main`). Evals call `claude -p` and cost money. The optional
+`--project-root <path>` rewrites retired sections in an existing non-git
+project container's `AGENTS.md` and `CLAUDE.md`: Team Sprint Mode, Beads'
+push-every-session "Landing the Plane", its ban on external trackers, and the
+old `kanban/` entry. The installer refuses repository targets.
 It copies the nine skills into Claude and Codex user directories, backs up
 affected files under `~/.local/state/tstack/`, and writes a manifest there.
 Claude's work profile shares the personal profile's skills directory locally.
@@ -76,6 +81,7 @@ Files kept in local form, and why:
 | `skills/full-send/references/project-context.md` | Local only: worktrees, laptop limits, model routing, readiness, communication. |
 | `skills/full-send/SKILL.md`, `council`, `babysit-pr`, `file-pr`, `modernize`, `takeover`, `leaving-pr-comments` | Point at project context; `full-send` also switches `sol-loop` to `review-loop`, and council and review-loop require a rerunnable proof per finding (from pstack's interrogate). |
 | `scripts/install-local.py`, `tests/`, `AGENTS.md`, `VALIDATION.md`, `README.md`, `.gitignore` | Local installer, its tests and local documentation. |
+| `evals/`, `scripts/run-evals.py` | Local model-behavior evals for the skills' text. |
 
 `full-stop` stays byte-identical to upstream. When an upstream merge touches a
 file above, resolve it by hand and update this table and the pin.

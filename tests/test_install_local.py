@@ -149,6 +149,38 @@ class InstallLocalTests(unittest.TestCase):
                          {'KEEP': 'value', 'JEV_DISABLED': '1'})
         self.assertEqual(installer.configure_codex(updated), updated)
 
+    def test_project_instructions_drop_retired_workflow_sections(self):
+        claude = ('# CLAUDE.md\n\n- `kanban/` — File-based Kanban boards for team sprints\n- `plans/` — keep\n\n'
+                  '## Team Sprint Mode\n\n### Every Turn\nspawn agents\n\n## Session Progress Log\nkeep\n')
+        agents = ('<!-- BEGIN BEADS INTEGRATION -->\n- ✅ Use bd for ALL task tracking\n'
+                  '- ❌ Do NOT use external issue trackers\n\n'
+                  '## Landing the Plane (Session Completion)\n\n- NEVER stop before pushing\n\n'
+                  '<!-- END BEADS INTEGRATION -->\n')
+        claude_out = installer.migrate_project_instructions(claude)
+        self.assertNotIn('kanban/', claude_out)
+        self.assertNotIn('spawn agents', claude_out)
+        self.assertIn('## Delivery workflows', claude_out)
+        self.assertIn('## Session Progress Log\nkeep', claude_out)
+        agents_out = installer.migrate_project_instructions(agents)
+        self.assertNotIn('NEVER stop before pushing', agents_out)
+        self.assertNotIn('external issue trackers', agents_out)
+        self.assertIn('## Ending a session', agents_out)
+        self.assertTrue(agents_out.endswith('<!-- END BEADS INTEGRATION -->\n'))
+        for text in (claude_out, agents_out):
+            self.assertEqual(installer.migrate_project_instructions(text), text)
+
+    def test_project_root_migrates_claude_md_too(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp).resolve()
+            project = home / 'project'
+            project.mkdir()
+            (project / 'CLAUDE.md').write_text('## Team Sprint Mode\nold\n\n## Other\nkeep\n')
+            backup, changes = installer.install(home, project)
+            text = (project / 'CLAUDE.md').read_text()
+            self.assertNotIn('Team Sprint Mode', text)
+            self.assertIn('## Other\nkeep', text)
+            self.assertIn(str(project / 'CLAUDE.md'), [c['path'] for c in changes])
+
 
 if __name__ == '__main__':
     unittest.main()

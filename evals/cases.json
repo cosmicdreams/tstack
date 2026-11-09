@@ -1,0 +1,23 @@
+[
+  {
+    "name": "merge-gate-without-required-checks",
+    "skills": ["full-send/SKILL.md"],
+    "scenario": "You are at step 6 of full-send for PR #12 in acme/site. The repository's ruleset requires a pull request but no status checks. Its CI workflow runs on push only, and the last push run on this branch passed. review-loop approved the final behavior diff. No review bots or human approvals are required. GitHub reports the PR as mergeable and up to date with main.",
+    "question": "What is your next action? Reply with only this JSON: {\"next_action\": \"merge\" | \"run_ci_checks_yourself\" | \"ask_user\"}",
+    "check": {"key": "next_action", "matches": "^run_ci_checks_yourself$"}
+  },
+  {
+    "name": "review-brief-names-project-rules",
+    "skills": ["review-loop/SKILL.md"],
+    "scenario": "You are starting round 1 of review-loop in /work/site. The repository root has an AGENTS.md with a 'Hit every surface' checklist and a testing policy, and it links docs/testing.md for review rules. Base is abc123, intent is 'keep editor settings through config import', nothing is out of scope, and the project's checks passed.",
+    "question": "Write the header lines of your round 1 brief, from 'Review only.' up to but not including the 'See:' line. Reply with only this JSON: {\"brief\": [\"<line>\", ...]}",
+    "check": {"key": "brief", "matches": "^Rules:.*AGENTS\\.md.*docs/testing\\.md|^Rules:.*docs/testing\\.md.*AGENTS\\.md"}
+  },
+  {
+    "name": "ledger-saved-outside-the-repository",
+    "skills": ["review-loop/SKILL.md"],
+    "scenario": "Round 1 of review-loop just finished for branch feature/cache-fix of the GitHub repository acme/site, PR #12. The reviewer reported S1 [should], which you fixed.",
+    "question": "Where do you save the review ledger now? Reply with only this JSON: {\"ledger_path\": \"<path, or none if you do not save it to a file>\"}",
+    "check": {"key": "ledger_path", "matches": "^(~|/Users/[^/]+|/home/[^/]+|\\$HOME)/\\.local/state/tstack/review-ledgers/acme-site/feature-cache-fix\\.jsonl$"}
+  }
+]

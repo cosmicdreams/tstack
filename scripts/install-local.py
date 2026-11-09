@@ -84,7 +84,7 @@ def install(home, project_root=None):
     files = [home / host / "settings.json" for host in (".claude", ".claude-work")]
     files.append(home / ".codex/config.toml")
     if project_root:
-        files.append(Path(project_root) / "AGENTS.md")
+        files.extend(Path(project_root) / name for name in PROJECT_INSTRUCTIONS)
     files.extend(path for cache in caches for path in cache.glob("*/skills/*/SKILL.md")
                  if path.parent.name in ("babysit-pr", "leave-pr-comment"))
     for path in files:
@@ -183,21 +183,39 @@ def install(home, project_root=None):
         export.unlink()  # Preserve the source checkout and Octopus state.
 
     if project_root:
-        instructions = Path(project_root) / "AGENTS.md"
-        if instructions.exists():
-            text = instructions.read_text()
-            text = re.sub(r"(?ms)^## Team Sprint Mode\n.*?(?=^## |\Z)",
-                          "## Delivery workflows\n\nUse the installed tstack skills for delivery: "
-                          "full-stop prepares an open,\nunmerged PR; full-send merges only when "
-                          "explicitly requested. review-loop and\ncouncil follow global model routing "
-                          "and project permissions. process-lab owns\nproject obligations and "
-                          "retrospectives. Keep Beads history; do not invoke\nretired sprint, retro, "
-                          "or improve plugins. All edits obey the golden rule.\n\n", text)
-            text = text.replace("`.beads/` — Beads databases: `sprint.db` (sprint board) and `retro.db` (retro actions board)",
-                                "`.beads/` — Shared Beads database; board labels separate sprint and retro history")
-            write(instructions, text)
+        for name in PROJECT_INSTRUCTIONS:
+            instructions = Path(project_root) / name
+            if instructions.exists():
+                write(instructions, migrate_project_instructions(instructions.read_text()))
 
     return backup, changes
+
+
+PROJECT_INSTRUCTIONS = ("AGENTS.md", "CLAUDE.md")
+DELIVERY = ("## Delivery workflows\n\nUse the installed tstack skills for delivery: "
+            "full-stop prepares an open,\nunmerged PR; full-send merges only when "
+            "explicitly requested. review-loop and\ncouncil follow global model routing "
+            "and project permissions. process-lab owns\nproject obligations and "
+            "retrospectives. Keep Beads history; do not invoke\nretired sprint, retro, "
+            "or improve plugins. All edits obey the golden rule.\n\n")
+# Beads' generated "Landing the Plane" section orders a push at the end of every
+# session, which contradicts full-stop, the golden rule and task-scoped push authority.
+SESSION_END = ("## Ending a session\n\nFile follow-up work in Beads and update issue status. "
+               "Commit, push, open a PR,\nor merge only when the current task and the delivery "
+               "workflows allow it.\n\n")
+
+
+def migrate_project_instructions(text):
+    """Rewrite retired workflow sections in a non-git project container's instructions."""
+    text = re.sub(r"(?ms)^## Team Sprint Mode\n.*?(?=^## |\Z)", DELIVERY, text)
+    text = re.sub(r"(?ms)^## Landing the Plane\b[^\n]*\n.*?(?=^<!-- END BEADS INTEGRATION -->|^## |\Z)",
+                  SESSION_END, text)
+    text = text.replace("`.beads/` — Beads databases: `sprint.db` (sprint board) and `retro.db` (retro actions board)",
+                        "`.beads/` — Shared Beads database; board labels separate sprint and retro history")
+    text = text.replace("- ❌ Do NOT use external issue trackers\n",
+                        "- ✅ Client tickets stay in the client's tracker, such as Jira; Beads tracks agent work\n")
+    text = re.sub(r"(?m)^- `kanban/` — File-based Kanban boards[^\n]*\n", "", text)
+    return text
 
 
 if __name__ == "__main__":
